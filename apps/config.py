@@ -20,6 +20,10 @@ class Config:
     # REMEMBER_COOKIE_DURATION = 3600  # 1시간
     CSRF_ENABLED = True
     CSRF_SESSION_KEY = os.getenv('CSRF_SESSION_KEY', SECRET_KEY) # 없으면,SECRET_KEY사용
+    #
+    ADMIN_USERNAME = os.getenv('ADMIN_USERNAME')    
+    ADMIN_EMAIL = os.getenv('ADMIN_EMAIL')    
+    ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 
 
     

@@ -36,4 +36,21 @@ def create_app():     #  factory 함수
     with app.app_context():
         db.drop_all()         # 운영시에는 커멘트 처리 필요
         db.create_all()       # 테이블 생성
-    return app
+        # 최초 관리자 계정 생성
+        admin_username = app.config.get('ADMIN_USERNAME')
+        admin_email = app.config.get('ADMIN_EMAIL')
+        admin_password = app.config.get('ADMIN_PASSWORD')
+
+        if admin_username and admin_password:
+            admin_user = User.query.filter_by(username=admin_username).first()
+            if not admin_user:
+                hashed_password = generate_password_hash(admin_password)
+                new_admin = User(username=admin_username, email=admin_email, password_hash=hashed_password, is_admin=True)
+                db.session.add(new_admin)
+                db.session.commit()
+                print(f"관리자 계정 '{admin_username}', '{admin_password}' 이(가) 생성되었습니다.")
+            else:
+                print(f"관리자 계정 '{admin_username}'이(가) 이미 존재합니다.")
+        else:
+            print("ADMIN_USERNAME 또는 ADMIN_PASSWORD 환경 변수가 설정되지 않았습니다.")
+        return app
