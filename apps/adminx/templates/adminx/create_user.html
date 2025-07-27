@@ -1,0 +1,37 @@
+{# apps/adminx/templates/adminx/create_user.html #}
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">새 사용자 생성</h1>
+
+<form method="POST" action="{{ url_for('adminx.create_user') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-3">
+        <label for="username" class="form-label">사용자 이름 <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="username" name="username" required
+               value="{{ request.form.username if request.method == 'POST' }}">
+        {# POST 요청 시 이전 입력값 유지 #}
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">이메일 <span class="text-danger">*</span></label>
+        <input type="email" class="form-control" id="email" name="email" required
+               value="{{ request.form.email if request.method == 'POST' }}">
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">비밀번호 <span class="text-danger">*</span></label>
+        <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin">
+        <label class="form-check-label" for="is_admin">관리자 권한 부여</label>
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>
+        <label class="form-check-label" for="is_active">계정 활성화</label>
+    </div>
+    <button type="submit" class="btn btn-primary">사용자 생성</button>
+    <a href="{{ url_for('adminx.manage_users') }}" class="btn btn-secondary ms-2">취소</a>
+</form>
+{% endblock %}

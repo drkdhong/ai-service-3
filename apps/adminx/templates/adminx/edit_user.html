@@ -1,0 +1,29 @@
+{# apps/adminx/templates/adminx/edit_user.html #}
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{{ title }}</h1>
+
+<form method="POST" action="{{ url_for('adminx.edit_user', user_id=user.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-3">
+        <label for="username" class="form-label">사용자 이름</label>
+        <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">이메일</label>
+        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+    </div>
+    {# 비밀번호 변경을 위한 필드를 추가할 수 있지만, 일반적으로 별도의 비밀번호 변경 페이지를 권장합니다. #}
+    {#
+    <div class="mb-3">
+        <label for="password" class="form-label">새 비밀번호 (변경 시에만 입력)</label>
+        <input type="password" class="form-control" id="password" name="password">
+    </div>
+    #}
+    <button type="submit" class="btn btn-primary">수정 완료</button>
+    <a href="{{ url_for('adminx.manage_users') }}" class="btn btn-secondary ms-2">목록으로</a>
+</form>
+{% endblock %}

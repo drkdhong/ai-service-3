@@ -29,9 +29,12 @@ def create_app():     #  factory 함수
     # 블루프린트 등록
     from .main import main
     from .auth import auth
+    from .adminx import adminx
 
     app.register_blueprint(main)
     app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(adminx, url_prefix='/adminx')
+
     # db 테이블 생성 및 관리자 초기계정 생성
     with app.app_context():
         db.drop_all()         # 운영시에는 커멘트 처리 필요
