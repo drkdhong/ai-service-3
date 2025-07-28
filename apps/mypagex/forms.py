@@ -1,4 +1,4 @@
-# apps/auth/forms.py 
+# apps/mypagex/forms.py 
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, PasswordField, StringField, SubmitField  #구성요소
 from wtforms.validators import DataRequired, Email, length, EqualTo, ValidationError #유효성

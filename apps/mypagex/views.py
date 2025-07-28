@@ -10,7 +10,7 @@ from apps.dbmodels import User
 def dashboard():
     total_api_keys = 3 # APIKey.query.filter_by(user_id=current_user.id).count()
     approved_subscriptions = 2 #Subscription.query.filter_by(user_id=current_user.id, status='approved').count()
-    pending_subscriptions = 1 #Subscription.query.filter_by(user_id=current_user.id, status='pending').count(  
+    pending_subscriptions = 1 #Subscription.query.filter_by(user_id=current_user.id, status='pending').count()  
     # 최근 사용 로그 5개
     recent_usage_logs = None
     # UsageLog.query.filter_by(user_id=current_user.id)\
