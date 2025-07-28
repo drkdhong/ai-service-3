@@ -32,9 +32,9 @@ def dashboard():
                            pending_subscriptions=pending_subscriptions,
                            recent_service_usage=recent_service_usage)
 
-PER_PAGE = 10
+#PER_PAGE = 10
 
-@adminx.route('/users', methods=['GET', 'POST'])
+@adminx.route('/manage_users', methods=['GET', 'POST'])
 @admin_required
 def manage_users():
     PER_PAGE = 10
@@ -58,14 +58,14 @@ def manage_users():
     users = users_pagination.items
 
     return render_template(
-        'adminx/users.html',
+        'adminx/manage_users.html',
         title='사용자 관리',
         users=users,
         pagination=users_pagination,
         search_query=search_query,
     )
 
-@adminx.route('/users/<int:user_id>/toggle_active', methods=['POST'])
+@adminx.route('/manage_users/<int:user_id>/toggle_active', methods=['POST'])
 @admin_required
 def toggle_user_active(user_id):
     user = User.query.get_or_404(user_id)
@@ -78,7 +78,7 @@ def toggle_user_active(user_id):
     flash(f'{user.username} 계정 상태가 {"활성" if user.is_active else "비활성"}으로 변경되었습니다.', 'success')
     return redirect(url_for('adminx.manage_users'))
 
-@adminx.route('/users/<int:user_id>/toggle_admin', methods=['POST'])
+@adminx.route('/manage_users/<int:user_id>/toggle_admin', methods=['POST'])
 @admin_required
 def toggle_user_admin(user_id):
 
@@ -92,7 +92,7 @@ def toggle_user_admin(user_id):
     flash(f'{user.username} 계정의 관리자 권한이 {"부여" if user.is_admin else "해제"}되었습니다.', 'success')
     return redirect(url_for('adminx.manage_users'))
 
-@adminx.route('/users/<int:user_id>/edit', methods=['GET', 'POST'])
+@adminx.route('/manage_users/<int:user_id>/edit', methods=['GET', 'POST'])
 @admin_required
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)
@@ -114,7 +114,7 @@ def edit_user(user_id):
 
     return render_template('adminx/edit_user.html', title=f'{user.username} 수정', user=user)
 
-@adminx.route('/users/<int:user_id>/delete', methods=['POST'])
+@adminx.route('/manage_users/<int:user_id>/delete', methods=['POST'])
 @admin_required
 def delete_user(user_id):
 
@@ -134,7 +134,7 @@ def delete_user(user_id):
 
     return redirect(url_for('adminx.manage_users'))
 
-@adminx.route('/users/create', methods=['GET', 'POST'])
+@adminx.route('/manage_users/create', methods=['GET', 'POST'])
 @admin_required
 def create_user():
 
