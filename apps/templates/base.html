@@ -19,7 +19,7 @@
                 </li>
                 {% if current_user.is_authenticated %} {# 로그인된 사용자에게만 보이는 메뉴 #}
                     <li class="nav-item">
-{#                        <a class="nav-link" href="{{ url_for('mypagex.dashboard') }}">마이페이지</a>  #}
+                        <a class="nav-link" href="{{ url_for('mypagex.dashboard') }}">마이페이지</a>  
 {#                     <a class="nav-link" href="{{ url_for('user.mypage') }}">마이페이지</a>   #}
                     </li>
                     {% if current_user.is_admin %} {# 관리자에게만 보이는 메뉴 #}

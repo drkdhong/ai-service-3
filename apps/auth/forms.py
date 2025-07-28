@@ -46,10 +46,3 @@ class LoginForm(FlaskForm):      # FlaskForm 상속
         validators=[ DataRequired(message="비밀번호 필수")]  )
     remember = BooleanField('로그인 정보 기억')
     submit=SubmitField("로그인")
-
-# form class 추가 - 비밀번호 변경 폼
-class ChangePasswordForm(FlaskForm):
-    current_password = PasswordField('현재 비밀번호', validators=[DataRequired()])
-    new_password = PasswordField('새 비밀번호', validators=[DataRequired(), length(min=1)])
-    confirm_new_password = PasswordField('새 비밀번호 확인', validators=[DataRequired(), EqualTo('new_password')])
-    submit = SubmitField('비밀번호 변경')
