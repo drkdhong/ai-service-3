@@ -7,42 +7,19 @@
 <h1 class="mb-4">사용자 관리</h1>
 
 <div class="row mb-3">
-    <div class="col-md-12"> {# Change to col-md-12 to give more space for the expanded form #}
-        <form action="{{ url_for('adminx.manage_users') }}" method="GET">
-            <div class="row g-2"> {# Use row and g-2 for gutter spacing #}
-                <div class="col-md-4 col-12">
-                    <input type="search" name="search" class="form-control" placeholder="사용자 이름 또는 이메일 검색"
-                           value="{{ search_query if search_query }}" aria-label="Search">
-                </div>
-                <div class="col-md-2 col-6">
-                    <select name="is_admin" class="form-select">
-                        <option value="">관리자 여부</option>
-                        <option value="true" {% if is_admin_query == 'true' %}selected{% endif %}>관리자</option>
-                        <option value="false" {% if is_admin_query == 'false' %}selected{% endif %}>일반</option>
-                    </select>
-                </div>
-                <div class="col-md-2 col-6">
-                    <select name="is_active" class="form-select">
-                        <option value="">활성 상태</option>
-                        <option value="true" {% if is_active_query == 'true' %}selected{% endif %}>활성</option>
-                        <option value="false" {% if is_active_query == 'false' %}selected{% endif %}>비활성</option>
-                    </select>
-                </div>
-                <div class="col-md-2 col-12">
-                    <input type="date" name="created_at" class="form-control" placeholder="가입일"
-                           value="{{ created_at_query if created_at_query }}" aria-label="Registration Date">
-                </div>
-                <div class="col-md-2 col-12 d-grid"> {# d-grid makes button full width on small screens #}
-                    <button class="btn btn-primary" type="submit">검색</button>
-                </div>
-            </div>
+    <div class="col-md-6">
+        <form action="{{ url_for('adminx.manage_users') }}" method="GET" class="d-flex">
+            <input type="search" name="search" class="form-control me-2" placeholder="사용자 이름 또는 이메일 검색"
+                   value="{{ search_query if search_query }}" aria-label="Search">
+            <button class="btn  btn-primary" type="submit" style="white-space: nowrap;">검색</button>
+            {# 또는 필요하다면 아래와 같이 CSS 클래스를 활용할 수도 있습니다 (Bootstrap 5 기준) #}
+            {# <button class="btn btn-outline-success text-nowrap" type="submit">검색</button> #}
+
         </form>
     </div>
-</div>
-
-<div class="row mb-3">
-    <div class="col-12 text-md-end"> {# Ensure button is right-aligned on desktop, full-width on mobile #}
-        <a href="{{ url_for('adminx.create_user') }}" class="btn btn-primary w-100 w-md-auto user-create-btn">사용자 생성</a>
+    {# 모바일에서 버튼이 전체 너비를 차지하도록 w-100을 사용하고, 데스크톱에서는 w-auto로 자동 크기 조절 #}
+    <div class="col-md-6 text-md-end mt-2 mt-md-0">
+        <a href="{{ url_for('adminx.create_user') }}" class="btn btn-primary user-create-btn">사용자 생성</a>
     </div>
 </div>
 
@@ -89,7 +66,7 @@
                 <td>
                     {# 동작 컬럼: 활성/비활성 및 관리자 권한 토글 #}
                     {% if user.id != current_user.id %} {# 자기 자신은 변경 불가 #}
-                        <form method="POST" action="{{ url_for('adminx.toggle_user_active', user_id=user.id, search=search_query, page=pagination.page, is_admin=is_admin_query, is_active=is_active_query, created_at=created_at_query) }}" style="display:inline;">
+                        <form method="POST" action="{{ url_for('adminx.toggle_user_active', user_id=user.id, search=search_query, page=pagination.page) }}" style="display:inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="btn btn-sm {% if user.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
                                     onclick="return confirm('이 사용자의 계정 상태를 변경하시겠습니까?');">
@@ -103,7 +80,7 @@
                 <td>
                     {# 동작 컬럼: 활성/비활성 및 관리자 권한 토글 #}
                     {% if user.id != current_user.id %} {# 자기 자신은 변경 불가 #}
-                        <form method="POST" action="{{ url_for('adminx.toggle_user_admin', user_id=user.id, search=search_query, page=pagination.page, is_admin=is_admin_query, is_active=is_active_query, created_at=created_at_query) }}" style="display:inline;" class="ms-1">
+                        <form method="POST" action="{{ url_for('adminx.toggle_user_admin', user_id=user.id, search=search_query, page=pagination.page) }}" style="display:inline;" class="ms-1">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="btn btn-sm {% if user.is_admin %}btn-outline-danger{% else %}btn-outline-info{% endif %}"
                                     onclick="return confirm('이 사용자의 관리자 권한을 변경하시겠습니까?');">
@@ -125,7 +102,7 @@
                 <td>
                     {# 수정/삭제 컬럼: 수정 및 삭제 버튼 #}
                     {% if user.id != current_user.id %} {# 자기 자신은 삭제 불가 #}
-                        <form method="POST" action="{{ url_for('adminx.delete_user', user_id=user.id, search=search_query, page=pagination.page, is_admin=is_admin_query, is_active=is_active_query, created_at=created_at_query) }}" style="display:inline;" class="ms-1">
+                        <form method="POST" action="{{ url_for('adminx.delete_user', user_id=user.id) }}" style="display:inline;" class="ms-1">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="btn btn-sm btn-danger"
                                     onclick="return confirm('정말로 {{ user.username }} 사용자를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
@@ -147,7 +124,7 @@
     <ul class="pagination justify-content-center">
         {% if pagination.has_prev %}
         <li class="page-item">
-            <a class="page-link" href="{{ url_for('adminx.manage_users', page=pagination.prev_num, search=search_query, is_admin=is_admin_query, is_active=is_active_query, created_at=created_at_query) }}" aria-label="Previous">
+            <a class="page-link" href="{{ url_for('adminx.manage_users', page=pagination.prev_num, search=search_query) }}" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -162,7 +139,7 @@
                 {% if p == pagination.page %}
                 <li class="page-item active" aria-current="page"><span class="page-link">{{ p }}</span></li>
                 {% else %}
-                <li class="page-item"><a class="page-link" href="{{ url_for('adminx.manage_users', page=p, search=search_query, is_admin=is_admin_query, is_active=is_active_query, created_at=created_at_query) }}">{{ p }}</a></li>
+                <li class="page-item"><a class="page-link" href="{{ url_for('adminx.manage_users', page=p, search=search_query) }}">{{ p }}</a></li>
                 {% endif %}
             {% else %}
                 <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -171,7 +148,7 @@
 
         {% if pagination.has_next %}
         <li class="page-item">
-            <a class="page-link" href="{{ url_for('adminx.manage_users', page=pagination.next_num, search=search_query, is_admin=is_admin_query, is_active=is_active_query, created_at=created_at_query) }}" aria-label="Next">
+            <a class="page-link" href="{{ url_for('adminx.manage_users', page=pagination.next_num, search=search_query) }}" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
             </a>
         </li>
@@ -188,18 +165,4 @@
     등록된 사용자가 없습니다.
 </div>
 {% endif %}
-
-<style>
-/* 모바일 (기본값) */
-.user-create-btn {
-    width: 100%; /* 모바일에서 전체 폭 */
-}
-
-/* Medium (md) 이상 화면 (768px 이상) */
-@media (min-width: 768px) {
-    .user-create-btn {
-        width: auto; /* 데스크톱에서 내용에 맞춰 자동 크기 */
-    }
-}
-</style>
 {% endblock %}

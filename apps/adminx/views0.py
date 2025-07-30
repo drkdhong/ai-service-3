@@ -21,9 +21,9 @@ def dashboard():
     recent_service_usage = 0
 
     #recent_service_usage = db.session.query(func.sum(UsageLog.usage_count))\
-    #                            .filter(UsageLog.timestamp >= seven_days_ago)\
-    #                            .filter(UsageLog.usage_type.notin_([UsageLog.UsageType.LOGIN]))\
-    #                            .scalar() or 0
+    #                                .filter(UsageLog.timestamp >= seven_days_ago)\
+    #                                .filter(UsageLog.usage_type.notin_([UsageLog.UsageType.LOGIN]))\
+    #                                .scalar() or 0
 
     return render_template('adminx/dashboard.html',
                            title='관리자 대시보드',
@@ -32,22 +32,18 @@ def dashboard():
                            pending_subscriptions=pending_subscriptions,
                            recent_service_usage=recent_service_usage)
 
+#PER_PAGE = 10
+
 @adminx.route('/manage_users', methods=['GET', 'POST'])
 @admin_required
 def manage_users():
     PER_PAGE = 10
     page = request.args.get('page', 1, type=int)
     search_query = request.args.get('search', '', type=str)
-    
-    # --- New search parameters ---
-    is_admin_query = request.args.get('is_admin', '', type=str) # 'true', 'false', or ''
-    is_active_query = request.args.get('is_active', '', type=str) # 'true', 'false', or ''
-    created_at_query = request.args.get('created_at', '', type=str) # YYYY-MM-DD format
-    # ---------------------------
 
     users_query = User.query
 
-    # 검색 기능 (사용자 이름 또는 이메일)
+    # 검색 기능
     if search_query:
         users_query = users_query.filter(
             or_(
@@ -55,37 +51,9 @@ def manage_users():
                 User.email.ilike(f'%{search_query}%')
             )
         )
-    
-    # 관리자 여부 필터링
-    if is_admin_query:
-        if is_admin_query == 'true':
-            users_query = users_query.filter(User.is_admin == True)
-        elif is_admin_query == 'false':
-            users_query = users_query.filter(User.is_admin == False)
-
-    # 활성 상태 필터링
-    if is_active_query:
-        if is_active_query == 'true':
-            users_query = users_query.filter(User.is_active == True)
-        elif is_active_query == 'false':
-            users_query = users_query.filter(User.is_active == False)
-
-    # 가입일 필터링
-    if created_at_query:
-        try:
-            # Parse the date string. We want to filter for users created ON that specific date.
-            # So, from the start of that day up to the end of that day.
-            search_date = datetime.datetime.strptime(created_at_query, '%Y-%m-%d').date()
-            start_of_day = datetime.datetime.combine(search_date, datetime.time.min)
-            end_of_day = datetime.datetime.combine(search_date, datetime.time.max)
-            users_query = users_query.filter(User.created_at >= start_of_day, User.created_at <= end_of_day)
-        except ValueError:
-            flash('유효하지 않은 가입일 형식입니다. YYYY-MM-DD 형식으로 입력해주세요.', 'warning')
-            # Optionally, you might want to clear the created_at_query here to avoid re-applying invalid filter
-            created_at_query = ''
-
 
     # 페이지네이션 적용
+    # paginate(page, per_page, error_out=False)
     users_pagination = users_query.order_by(User.created_at.desc()).paginate(page=page, per_page=PER_PAGE, error_out=False)
     users = users_pagination.items
 
@@ -95,11 +63,6 @@ def manage_users():
         users=users,
         pagination=users_pagination,
         search_query=search_query,
-        # --- Pass new search parameters to the template ---
-        is_admin_query=is_admin_query,
-        is_active_query=is_active_query,
-        created_at_query=created_at_query,
-        # --------------------------------------------------
     )
 
 @adminx.route('/manage_users/<int:user_id>/toggle_active', methods=['POST'])
@@ -108,41 +71,43 @@ def toggle_user_active(user_id):
     user = User.query.get_or_404(user_id)
     if user.id == current_user.id:
         flash('자신의 계정 상태는 변경할 수 없습니다.', 'warning')
-        return redirect(url_for('adminx.manage_users', **request.args)) # Pass current search args
+        return redirect(url_for('adminx.manage_users'))
 
     user.is_active = not user.is_active
     db.session.commit()
     flash(f'{user.username} 계정 상태가 {"활성" if user.is_active else "비활성"}으로 변경되었습니다.', 'success')
-    return redirect(url_for('adminx.manage_users', **request.args)) # Pass current search args
+    return redirect(url_for('adminx.manage_users'))
 
 @adminx.route('/manage_users/<int:user_id>/toggle_admin', methods=['POST'])
 @admin_required
 def toggle_user_admin(user_id):
+
     user = User.query.get_or_404(user_id)
     if user.id == current_user.id:
         flash('자신의 관리자 권한은 변경할 수 없습니다.', 'warning')
-        return redirect(url_for('adminx.manage_users', **request.args)) # Pass current search args
+        return redirect(url_for('adminx.manage_users'))
 
     user.is_admin = not user.is_admin
     db.session.commit()
     flash(f'{user.username} 계정의 관리자 권한이 {"부여" if user.is_admin else "해제"}되었습니다.', 'success')
-    return redirect(url_for('adminx.manage_users', **request.args)) # Pass current search args
+    return redirect(url_for('adminx.manage_users'))
 
 @adminx.route('/manage_users/<int:user_id>/edit', methods=['GET', 'POST'])
 @admin_required
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)
     if request.method == 'POST':
+        # 실제 폼 데이터 처리 로직 (예: WTForms 사용)
         user.username = request.form.get('username', user.username)
         user.email = request.form.get('email', user.email)
         # 비밀번호 변경 로직은 별도로 처리하는 것이 좋습니다.
         # if 'password' in request.form and request.form['password']:
-        #    user.set_password(request.form['password'])
+        #     user.set_password(request.form['password'])
 
         try:
             db.session.commit()
             flash(f'{user.username}님의 정보가 성공적으로 수정되었습니다.', 'success')
-            return redirect(url_for('adminx.manage_users')) # No need to pass search args here unless you want to return to filtered view
+            return redirect(url_for('adminx.manage_users'))
         except Exception as e:
             db.session.rollback()
             flash(f'사용자 정보 수정 중 오류가 발생했습니다: {e}', 'danger')
@@ -152,11 +117,12 @@ def edit_user(user_id):
 @adminx.route('/manage_users/<int:user_id>/delete', methods=['POST'])
 @admin_required
 def delete_user(user_id):
+
     user = User.query.get_or_404(user_id)
 
     if user.id == current_user.id:
         flash('자신의 계정은 삭제할 수 없습니다.', 'warning')
-        return redirect(url_for('adminx.manage_users', **request.args)) # Pass current search args
+        return redirect(url_for('adminx.manage_users'))
 
     try:
         db.session.delete(user)
@@ -166,11 +132,12 @@ def delete_user(user_id):
         db.session.rollback()
         flash(f'사용자 삭제 중 오류가 발생했습니다: {e}', 'danger')
 
-    return redirect(url_for('adminx.manage_users', **request.args)) # Pass current search args
+    return redirect(url_for('adminx.manage_users'))
 
 @adminx.route('/manage_users/create', methods=['GET', 'POST'])
 @admin_required
 def create_user():
+
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
