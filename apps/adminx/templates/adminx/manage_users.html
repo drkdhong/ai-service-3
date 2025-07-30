@@ -17,8 +17,9 @@
 
         </form>
     </div>
-    <div class="col-md-6 text-end"> {# 버튼을 오른쪽에 정렬 #}
-        <a href="{{ url_for('adminx.create_user') }}" class="btn btn-primary">사용자 생성</a>
+    {# 모바일에서 버튼이 전체 너비를 차지하도록 w-100을 사용하고, 데스크톱에서는 w-auto로 자동 크기 조절 #}
+    <div class="col-md-6 text-md-end mt-2 mt-md-0">
+        <a href="{{ url_for('adminx.create_user') }}" class="btn btn-primary user-create-btn">사용자 생성</a>
     </div>
 </div>
 
@@ -34,8 +35,10 @@
                 <th scope="col">활성 상태</th>
                 <th scope="col">총 사용 횟수</th>
                 <th scope="col">가입일</th>
-                <th scope="col">동작</th> {# 기존 '동작' 컬럼 #}
-                <th scope="col">수정/삭제</th> {# 새로 추가될 컬럼 #}
+                <th scope="col">활성화</th> {# 모바일용 컬럼 분리 #}
+                <th scope="col">관리자</th> {# 모바일용 컬럼 분리 #}
+                <th scope="col">수정</th> {# 모바일용 컬럼 분리 #}
+                <th scope="col">삭제</th> {# 모바일용 컬럼 분리 #}
             </tr>
         </thead>
         <tbody>
@@ -70,6 +73,13 @@
                                 {{ '비활성화' if user.is_active else '활성화' }}
                             </button>
                         </form>
+                    {% else %}
+                        <small class="text-muted">자기 계정</small>
+                    {% endif %}
+                </td>
+                <td>
+                    {# 동작 컬럼: 활성/비활성 및 관리자 권한 토글 #}
+                    {% if user.id != current_user.id %} {# 자기 자신은 변경 불가 #}
                         <form method="POST" action="{{ url_for('adminx.toggle_user_admin', user_id=user.id, search=search_query, page=pagination.page) }}" style="display:inline;" class="ms-1">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="btn btn-sm {% if user.is_admin %}btn-outline-danger{% else %}btn-outline-info{% endif %}"
@@ -83,8 +93,15 @@
                 </td>
                 <td>
                     {# 수정/삭제 컬럼: 수정 및 삭제 버튼 #}
-                    {% if user.id != current_user.id %} {# 자기 자신은 삭제 불가 #}
+                    {% if user.id != current_user.id %} {# 자기 자신은 수정 불가 #}
                         <a href="{{ url_for('adminx.edit_user', user_id=user.id) }}" class="btn btn-sm btn-info">수정</a>
+                    {% else %}
+                        <small class="text-muted">불가</small>
+                    {% endif %}
+                </td>
+                <td>
+                    {# 수정/삭제 컬럼: 수정 및 삭제 버튼 #}
+                    {% if user.id != current_user.id %} {# 자기 자신은 삭제 불가 #}
                         <form method="POST" action="{{ url_for('adminx.delete_user', user_id=user.id) }}" style="display:inline;" class="ms-1">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="btn btn-sm btn-danger"
@@ -93,7 +110,7 @@
                             </button>
                         </form>
                     {% else %}
-                        <small class="text-muted">수정 불가</small>
+                        <small class="text-muted">불가</small>
                     {% endif %}
                 </td>
             </tr>

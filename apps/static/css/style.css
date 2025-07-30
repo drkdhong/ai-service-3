@@ -1,6 +1,18 @@
+/* 모바일 (기본값) */
+.user-create-btn {
+    width: 100%; /* 모바일에서 전체 폭 */
+}
+
+/* Medium (md) 이상 화면 (768px 이상) */
+@media (min-width: 768px) {
+    .user-create-btn {
+        width: auto; /* 데스크톱에서 내용에 맞춰 자동 크기 */
+    }
+}
 body {
     background-color: #f5f5f5;
 }
+
 h4 {
    margin-top: 20px;
 }
