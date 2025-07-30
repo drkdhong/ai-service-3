@@ -6,10 +6,12 @@
 {% block content %}
 <h1 class="mb-4">사용자 관리</h1>
 
-<div class="row mb-3">
-    <div class="col-md-12"> {# Change to col-md-12 to give more space for the expanded form #}
+{# 검색 폼과 사용자 생성 버튼을 포함하는 하나의 행 #}
+<div class="row mb-3 align-items-end"> {# align-items-end: 행 내부 요소를 아래쪽에 정렬합니다. #}
+    {# 검색 폼 영역: 데스크톱에서는 9/12 컬럼, 모바일에서는 12/12 컬럼 #}
+    <div class="col-md-9 col-12">
         <form action="{{ url_for('adminx.manage_users') }}" method="GET">
-            <div class="row g-2"> {# Use row and g-2 for gutter spacing #}
+            <div class="row g-2"> {# 각 검색 필드와 버튼 간의 간격(gutter)을 설정 #}
                 <div class="col-md-4 col-12">
                     <input type="search" name="search" class="form-control" placeholder="사용자 이름 또는 이메일 검색"
                            value="{{ search_query if search_query }}" aria-label="Search">
@@ -32,17 +34,15 @@
                     <input type="date" name="created_at" class="form-control" placeholder="가입일"
                            value="{{ created_at_query if created_at_query }}" aria-label="Registration Date">
                 </div>
-                <div class="col-md-2 col-12 d-grid"> {# d-grid makes button full width on small screens #}
+                <div class="col-md-2 col-12 d-grid"> {# d-grid: 모바일에서 버튼이 부모 컬럼의 전체 너비를 차지하도록 함 #}
                     <button class="btn btn-primary" type="submit">검색</button>
                 </div>
             </div>
         </form>
     </div>
-</div>
-
-<div class="row mb-3">
-    <div class="col-12 text-md-end"> {# Ensure button is right-aligned on desktop, full-width on mobile #}
-        <a href="{{ url_for('adminx.create_user') }}" class="btn btn-primary w-100 w-md-auto user-create-btn">사용자 생성</a>
+    {# "사용자 생성" 버튼 영역: 데스크톱에서는 3/12 컬럼, 모바일에서는 12/12 컬럼 #}
+    <div class="col-md-3 col-12 mt-2 mt-md-0 d-grid d-md-block text-md-end">
+        <a href="{{ url_for('adminx.create_user') }}" class="btn btn-primary user-create-btn">사용자 생성</a>
     </div>
 </div>
 
@@ -58,10 +58,10 @@
                 <th scope="col">활성 상태</th>
                 <th scope="col">총 사용 횟수</th>
                 <th scope="col">가입일</th>
-                <th scope="col">활성화</th> {# 모바일용 컬럼 분리 #}
-                <th scope="col">관리자</th> {# 모바일용 컬럼 분리 #}
-                <th scope="col">수정</th> {# 모바일용 컬럼 분리 #}
-                <th scope="col">삭제</th> {# 모바일용 컬럼 분리 #}
+                <th scope="col">활성화</th>
+                <th scope="col">관리자</th>
+                <th scope="col">수정</th>
+                <th scope="col">삭제</th>
             </tr>
         </thead>
         <tbody>
@@ -87,8 +87,7 @@
                 <td>{{ user.usage_count }}</td>
                 <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
                 <td>
-                    {# 동작 컬럼: 활성/비활성 및 관리자 권한 토글 #}
-                    {% if user.id != current_user.id %} {# 자기 자신은 변경 불가 #}
+                    {% if user.id != current_user.id %}
                         <form method="POST" action="{{ url_for('adminx.toggle_user_active', user_id=user.id, search=search_query, page=pagination.page, is_admin=is_admin_query, is_active=is_active_query, created_at=created_at_query) }}" style="display:inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="btn btn-sm {% if user.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
@@ -101,8 +100,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    {# 동작 컬럼: 활성/비활성 및 관리자 권한 토글 #}
-                    {% if user.id != current_user.id %} {# 자기 자신은 변경 불가 #}
+                    {% if user.id != current_user.id %}
                         <form method="POST" action="{{ url_for('adminx.toggle_user_admin', user_id=user.id, search=search_query, page=pagination.page, is_admin=is_admin_query, is_active=is_active_query, created_at=created_at_query) }}" style="display:inline;" class="ms-1">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="btn btn-sm {% if user.is_admin %}btn-outline-danger{% else %}btn-outline-info{% endif %}"
@@ -115,16 +113,14 @@
                     {% endif %}
                 </td>
                 <td>
-                    {# 수정/삭제 컬럼: 수정 및 삭제 버튼 #}
-                    {% if user.id != current_user.id %} {# 자기 자신은 수정 불가 #}
+                    {% if user.id != current_user.id %}
                         <a href="{{ url_for('adminx.edit_user', user_id=user.id) }}" class="btn btn-sm btn-info">수정</a>
                     {% else %}
                         <small class="text-muted">불가</small>
                     {% endif %}
                 </td>
                 <td>
-                    {# 수정/삭제 컬럼: 수정 및 삭제 버튼 #}
-                    {% if user.id != current_user.id %} {# 자기 자신은 삭제 불가 #}
+                    {% if user.id != current_user.id %}
                         <form method="POST" action="{{ url_for('adminx.delete_user', user_id=user.id, search=search_query, page=pagination.page, is_admin=is_admin_query, is_active=is_active_query, created_at=created_at_query) }}" style="display:inline;" class="ms-1">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="btn btn-sm btn-danger"
