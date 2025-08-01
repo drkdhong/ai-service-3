@@ -1,9 +1,9 @@
 <!-- apps/adminx/templates/adminx/dashboard.html -->
 {% extends "base.html" %}
 {% block title %}{{ title }}{% endblock %}
+
 {% block content %}
 <h1 class="mb-4">관리자 대시보드</h1>
-
 <div class="row">
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-info mb-3 h-100">
@@ -21,8 +21,7 @@
             <div class="card-body">
                 <h5 class="card-title display-4">{{ total_services }} 개</h5>
                 <p class="card-text">플랫폼에 등록된 AI 서비스 수.</p>
-                <a href="#"" class="btn btn-light btn-sm">서비스 관리</a>
-                {# <a href="{{ url_for('adminx.services') }}" class="btn btn-light btn-sm">서비스 관리</a> #}
+                <a href="{{ url_for('adminx.services') }}" class="btn btn-light btn-sm">서비스 관리</a>
             </div>
         </div>
     </div>
@@ -49,25 +48,20 @@
         </div>
     </div>
 </div>
-
 <div class="row mt-4">
     <div class="col-12">
         <div class="card shadow-sm">
-            <div class="card-header bg-secondary text-white">
-                빠른 링크
-            </div>
+            <div class="card-header bg-secondary text-white">빠른 링크</div>
             <div class="card-body">
                 <a href="{{ url_for('adminx.manage_users') }}" class="btn btn-outline-secondary me-2 mb-2">사용자 관리</a>
-                <a href="#" class="btn btn-outline-secondary me-2 mb-2">AI 서비스 관리</a>
-                <a href="#" class="btn btn-outline-secondary me-2 mb-2">새 서비스 추가</a>
+                <a href="{{ url_for('adminx.services') }}" class="btn btn-outline-secondary me-2 mb-2">서비스 관리</a>
+                <a href="{{ url_for('adminx.create_service') }}" class="btn btn-outline-secondary me-2 mb-2">새 서비스 추가</a>
                 <a href="#" class="btn btn-outline-secondary me-2 mb-2">구독 요청 관리</a>
                 <a href="#" class="btn btn-outline-secondary me-2 mb-2">사용 통계 차트</a>
-                {# <a href="{{ url_for('adminx.services') }}" class="btn btn-outline-secondary me-2 mb-2">AI 서비스 관리</a> #}
-                {# <a href="{{ url_for('adminx.new_service') }}" class="btn btn-outline-secondary me-2 mb-2">새 서비스 추가</a> #}
                 {# <a href="{{ url_for('adminx.subscriptions') }}" class="btn btn-outline-secondary me-2 mb-2">구독 요청 관리</a> #}
                 {# <a href="{{ url_for('adminx.usage_charts') }}" class="btn btn-outline-secondary me-2 mb-2">사용 통계 차트</a> #}
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+</div>{% endblock %}
+

@@ -1,0 +1,41 @@
+{# apps/adminx/templates/adminx/create_service.html #}
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1 class="mb-4">새 서비스 생성</h1>
+<form method="POST" action="{{ url_for('adminx.create_service') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-3">
+        <label for="servicename" class="form-label">서비스 이름 <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="servicename" name="servicename" required
+               value="{{ request.form.servicename if request.method == 'POST' }}">
+        {# POST 요청 시 이전 입력값 유지 #}
+    </div>
+    <div class="mb-3">
+        <label for="price" class="form-label">단가<span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="price" name="price" required
+               value="{{ request.form.price if request.method == 'POST' }}">
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">서비스 설명<span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="description" name="description" required
+               value="{{ request.form.description if request.method == 'POST' }}">
+    </div>
+    <div class="mb-3">
+        <label for="keywords" class="form-label">키워드<span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="keywords" name="keywords" required
+               value="{{ request.form.keywords if request.method == 'POST' }}">
+    </div>
+    <div class="mb-3">
+        <label for="service_endpoint" class="form-label">서비스 엔드포인트<span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="service_endpoint" name="service_endpoint" required
+               value="{{ request.form.service_endpoint if request.method == 'POST' }}">
+    </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>
+        <label class="form-check-label" for="is_active">서비스 활성화</label>
+    </div>
+    <button type="submit" class="btn btn-primary">서비스 생성</button>
+    <a href="{{ url_for('adminx.services') }}" class="btn btn-secondary ms-2">취소</a>
+</form>
+{% endblock %}

@@ -1,0 +1,28 @@
+{# apps/adminx/templates/adminx/edit_service.html #}
+{% extends "base.html" %}{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1 class="mb-4">{{ title }}</h1>
+<form method="POST" action="{{ url_for('adminx.edit_service', service_id=service.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-3">
+        <label for="servicename" class="form-label">서비스 이름</label>
+        <input type="text" class="form-control" id="servicename" name="servicename" value="{{ service.servicename }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="price" class="form-label">단가</label>
+        <input type="text" class="form-control" id="price" name="price" value="{{ service.price }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">서비스 설명</label>
+        <input type="text" class="form-control" id="description" name="description" value="{{ service.description }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="keywords" class="form-label">키워드</label>
+        <input type="text" class="form-control" id="keywords" name="keywords" value="{{ service.keywords }}" required></div>
+    <div class="mb-3">
+        <label for="service_endpoint" class="form-label">서비스 엔드포인트</label>
+        <input type="text" class="form-control" id="service_endpoint" name=" service_endpoint " value="{{ service. service_endpoint }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">수정 완료</button>
+    <a href="{{ url_for('adminx.services') }}" class="btn btn-secondary ms-2">목록으로</a>
+</form>{% endblock %}
