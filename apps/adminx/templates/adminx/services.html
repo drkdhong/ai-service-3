@@ -21,6 +21,13 @@
                         <option value="false" {% if is_active_query == 'false' %}selected{% endif %}>비활성</option>
                     </select>
                 </div>
+                <div class="col-md-2 col-6">
+                    <select name="is_auto" class="form-select">
+                        <option value="">승인</option>
+                        <option value="true" {% if is_auto_query == 'true' %}selected{% endif %}>자동</option>
+                        <option value="false" {% if is_auto_query == 'false' %}selected{% endif %}>수동</option>
+                    </select>
+                </div>
                 <div class="col-md-2 col-12">
                     <input type="date" name="created_at" class="form-control" placeholder="등록일"
                            value="{{ created_at_query if created_at_query }}" aria-label="Registration Date">
@@ -42,14 +49,16 @@
         <thead class="table-primary">
             <tr>
                 <th scope="col">ID</th>
-                <th scope="col">서비스 이름</th>
+                <th scope="col">이름</th>
                 <th scope="col">단가</th>
                 <th scope="col">설명</th>
                 <th scope="col">키워드</th>
                 <th scope="col">엔드포인트</th>
-                <th scope="col">활성 상태</th>
+                <th scope="col">활성</th>
+                <th scope="col">승인</th>
                 <th scope="col">등록일</th>
                 <th scope="col">활성화</th>
+                <th scope="col">승인</th>
                 <th scope="col">수정</th>
                 <th scope="col">삭제</th>
             </tr>
@@ -70,14 +79,31 @@
                         <span class="badge bg-warning text-dark">비활성</span>
                     {% endif %}
                 </td>
+                <td>
+                    {% if service.is_auto %}
+                        <span class="badge bg-success">자동</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">수동</span>
+                    {% endif %}
+                </td>
                 <td>{{ service.created_at.strftime('%Y-%m-%d') }}</td>
                 <td>
                     {# 동작 컬럼: 활성화/비활성화 토글 #}
                     <form method="POST" action="{{ url_for('adminx.toggle_service_active', service_id=service.id, search=search_query, page=pagination.page, is_active=is_active_query, created_at=created_at_query) }}" style="display:inline;">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-sm {% if service.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
-                                onclick="return confirm('이 서비스의 상태를 변경하시겠습니까?');">
+                                onclick="return confirm('이 서비스의 활성화 상태를 변경하시겠습니까?');">
                             {{ '비활성화' if service.is_active else '활성화' }}
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    {# 동작 컬럼: 자동/수동 토글 #}
+                    <form method="POST" action="{{ url_for('adminx.toggle_service_auto', service_id=service.id, search=search_query, page=pagination.page, is_active=is_active_query, is_auto=is_auto_query, created_at=created_at_query) }}" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm {% if service.is_auto %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
+                                onclick="return confirm('이 서비스의 승인 조건을 변경하시겠습니까?');">
+                            {{ '수동' if service.is_auto else '자동' }}
                         </button>
                     </form>
                 </td>

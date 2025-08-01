@@ -35,6 +35,10 @@
         <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>
         <label class="form-check-label" for="is_active">서비스 활성화</label>
     </div>
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="is_auto" name="is_auto" checked>
+        <label class="form-check-label" for="is_auto">자동 승인</label>
+    </div>
     <button type="submit" class="btn btn-primary">서비스 생성</button>
     <a href="{{ url_for('adminx.services') }}" class="btn btn-secondary ms-2">취소</a>
 </form>

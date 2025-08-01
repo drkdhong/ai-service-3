@@ -72,6 +72,7 @@ class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     servicename = db.Column(db.String(100), unique=True, nullable=False)
     is_active=db.Column(db.Boolean, default=True)  # 활성화 여부
+    is_auto=db.Column(db.Boolean, default=True)  # 자동승인 여부
     price = db.Column(db.Integer, default=0, nullable=False)  # 서비스 단가
     description = db.Column(db.Text, nullable=False)
     keywords = db.Column(db.String(200), nullable=False)

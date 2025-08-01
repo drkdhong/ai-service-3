@@ -13,6 +13,7 @@ from werkzeug.security import generate_password_hash # 비밀번호 해싱을 �
 def dashboard():
     total_users = User.query.count()
     total_services = Service.query.count()  # Service.query.filter_by(is_active=True).count()
+    active_services = Service.query.filter_by(is_active=True).count()
     pending_subscriptions = 4 # Subscription.query.filter_by(status='pending').count()
     # 최근 7일간 서비스 사용량 (로그인 제외)
     #seven_days_ago = datetime.now() - datetime.timedelta(days=7)
@@ -25,6 +26,7 @@ def dashboard():
                            title='관리자 대시보드',
                            total_users=total_users,
                            total_services=total_services,
+                           active_services=active_services,
                            pending_subscriptions=pending_subscriptions,
                            recent_service_usage=recent_service_usage)
 @adminx.route('/manage_users', methods=['GET', 'POST'])
@@ -186,6 +188,7 @@ def services():
     search_query = request.args.get('search', '', type=str)
     # --- New search parameters ---
     is_active_query = request.args.get('is_active', '', type=str) # 'true', 'false', or ''
+    is_auto_query = request.args.get('is_auto', '', type=str) # 'true', 'false', or ''
     created_at_query = request.args.get('created_at', '', type=str) # YYYY-MM-DD format
     # ---------------------------
     services_query = Service.query
@@ -204,6 +207,12 @@ def services():
             services_query = services_query.filter(Service.is_active == True)
         elif is_active_query == 'false':
             services_query = services_query.filter(Service.is_active == False)
+    # 자동 승인 상태 필터링
+    if is_auto_query:
+        if is_auto_query == 'true':
+            services_query = services_query.filter(Service.is_auto == True)
+        elif is_auto_query == 'false':
+            services_query = services_query.filter(Service.is_auto == False)
     # 가입일 필터링
     if created_at_query:
         try:
@@ -228,6 +237,7 @@ def services():
         search_query=search_query,
         # --- Pass new search parameters to the template ---
         is_active_query=is_active_query,
+        is_auto_query=is_auto_query,
         created_at_query=created_at_query,
         # --------------------------------------------------
     )
@@ -238,6 +248,14 @@ def toggle_service_active(service_id):
     service.is_active = not service.is_active
     db.session.commit()
     flash(f'{service.servicename} 서비스 상태가 {"활성" if service.is_active else "비활성"}으로 변경되었습니다.', 'success')
+    return redirect(url_for('adminx.services', **request.args)) # Pass current search args
+@adminx.route('/services/<int:service_id>/toggle_auto', methods=['POST'])
+@admin_required
+def toggle_service_auto(service_id):
+    service = Service.query.get_or_404(service_id)
+    service.is_auto = not service.is_auto
+    db.session.commit()
+    flash(f'{service.servicename} 자동 승인 상태가 {"자동" if service.is_auto else "수동"}으로 변경되었습니다.', 'success')
     return redirect(url_for('adminx.services', **request.args)) # Pass current search args
 @adminx.route('/services/<int:service_id>/edit', methods=['GET', 'POST'])
 @admin_required
@@ -275,6 +293,7 @@ def create_service():
     if request.method == 'POST':
         servicename = request.form.get('servicename')
         is_active = 'is_active' in request.form # 체크박스 여부 확인
+        is_auto = 'is_auto' in request.form # 체크박스 여부 확인
         price = request.form.get('price')
         description = request.form.get('description')
         keywords = request.form.get('keywords')
@@ -294,6 +313,7 @@ def create_service():
             new_service = Service(
                 servicename=servicename,
                 is_active=is_active,
+                is_auto=is_auto,
                 price = price,
                 description = description,
                 keywords = keywords,
