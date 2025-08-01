@@ -1,3 +1,4 @@
+# apps/dbmodels.py
 import enum
 import uuid
 from flask import current_app
@@ -101,3 +102,4 @@ class Subscription(db.Model):
     def __repr__(self) -> str:
         # service_id -> ai_service_id로 변경
         return f"<Subscription(user_id={self.user_id}, ai_service_id={self.ai_service_id}, status='{self.status}')>"
+

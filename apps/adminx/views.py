@@ -14,16 +14,13 @@ def dashboard():
     total_users = User.query.count()
     total_services = Service.query.count()  # Service.query.filter_by(is_active=True).count()
     pending_subscriptions = 4 # Subscription.query.filter_by(status='pending').count()
-    
     # 최근 7일간 서비스 사용량 (로그인 제외)
     #seven_days_ago = datetime.now() - datetime.timedelta(days=7)
     recent_service_usage = 0
-
     #recent_service_usage = db.session.query(func.sum(UsageLog.usage_count))\
     #                            .filter(UsageLog.timestamp >= seven_days_ago)\
     #                            .filter(UsageLog.usage_type.notin_([UsageLog.UsageType.LOGIN]))\
     #                            .scalar() or 0
-
     return render_template('adminx/dashboard.html',
                            title='관리자 대시보드',
                            total_users=total_users,
@@ -36,15 +33,11 @@ def manage_users():
     PER_PAGE = 10
     page = request.args.get('page', 1, type=int)
     search_query = request.args.get('search', '', type=str)
-    
     # --- New search parameters ---
     is_admin_query = request.args.get('is_admin', '', type=str) # 'true', 'false', or ''
     is_active_query = request.args.get('is_active', '', type=str) # 'true', 'false', or ''
     created_at_query = request.args.get('created_at', '', type=str) # YYYY-MM-DD format
-    # ---------------------------
-
     users_query = User.query
-
     # 검색 기능 (사용자 이름 또는 이메일)
     if search_query:
         users_query = users_query.filter(
@@ -80,7 +73,6 @@ def manage_users():
     # 페이지네이션 적용
     users_pagination = users_query.order_by(User.created_at.desc()).paginate(page=page, per_page=PER_PAGE, error_out=False)
     users = users_pagination.items
-
     return render_template(
         'adminx/manage_users.html',
         title='사용자 관리',
@@ -104,7 +96,6 @@ def toggle_user_active(user_id):
     db.session.commit()
     flash(f'{user.username} 계정 상태가 {"활성" if user.is_active else "비활성"}으로 변경되었습니다.', 'success')
     return redirect(url_for('adminx.manage_users'))
-
 @adminx.route('/manage_users/<int:user_id>/toggle_admin', methods=['POST'])
 @admin_required
 def toggle_user_admin(user_id):
@@ -127,7 +118,6 @@ def edit_user(user_id):
         # 비밀번호 변경 로직은 별도로 처리하는 것이 좋습니다.
         # if 'password' in request.form and request.form['password']:
         #     user.set_password(request.form['password'])
-
         try:
             db.session.commit()
             flash(f'{user.username}님의 정보가 성공적으로 수정되었습니다.', 'success')
@@ -135,18 +125,14 @@ def edit_user(user_id):
         except Exception as e:
             db.session.rollback()
             flash(f'사용자 정보 수정 중 오류가 발생했습니다: {e}', 'danger')
-
     return render_template('adminx/edit_user.html', title=f'{user.username} 수정', user=user)
 @adminx.route('/manage_users/<int:user_id>/delete', methods=['POST'])
 @admin_required
 def delete_user(user_id):
-
     user = User.query.get_or_404(user_id)
-
     if user.id == current_user.id:
         flash('자신의 계정은 삭제할 수 없습니다.', 'warning')
         return redirect(url_for('adminx.manage_users'))
-
     try:
         db.session.delete(user)
         db.session.commit()
@@ -154,24 +140,20 @@ def delete_user(user_id):
     except Exception as e:
         db.session.rollback()
         flash(f'사용자 삭제 중 오류가 발생했습니다: {e}', 'danger')
-
     return redirect(url_for('adminx.manage_users'))
 @adminx.route('/manage_users/create', methods=['GET', 'POST'])
 @admin_required
 def create_user():
-
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
         is_admin = 'is_admin' in request.form # 체크박스 여부 확인
         is_active = 'is_active' in request.form # 체크박스 여부 확인
-
         # 필수 필드 유효성 검사
         if not username or not email or not password:
             flash('사용자 이름, 이메일, 비밀번호는 필수 입력 사항입니다.', 'danger')
             return render_template('adminx/create_user.html', title='사용자 생성')
-
         # 사용자 이름 또는 이메일 중복 확인
         if User.query.filter_by(username=username).first():
             flash('이미 존재하는 사용자 이름입니다.', 'danger')
@@ -195,7 +177,6 @@ def create_user():
         except Exception as e:
             db.session.rollback()
             flash(f'사용자 생성 중 오류가 발생했습니다: {e}', 'danger')
-
     return render_template('adminx/create_user.html', title='사용자 생성')
 @adminx.route('/services', methods=['GET', 'POST'])
 @admin_required
@@ -203,14 +184,11 @@ def services():
     PER_PAGE = 10
     page = request.args.get('page', 1, type=int)
     search_query = request.args.get('search', '', type=str)
-    
     # --- New search parameters ---
     is_active_query = request.args.get('is_active', '', type=str) # 'true', 'false', or ''
     created_at_query = request.args.get('created_at', '', type=str) # YYYY-MM-DD format
     # ---------------------------
-
     services_query = Service.query
-
     # 검색 기능 (서비스 이름, 설명, 키워드로 검색)
     if search_query:
         services_query = services_query.filter(
@@ -226,7 +204,6 @@ def services():
             services_query = services_query.filter(Service.is_active == True)
         elif is_active_query == 'false':
             services_query = services_query.filter(Service.is_active == False)
-
     # 가입일 필터링
     if created_at_query:
         try:
@@ -243,7 +220,6 @@ def services():
     # 페이지네이션 적용
     services_pagination = services_query.order_by(Service.created_at.desc()).paginate(page=page, per_page=PER_PAGE, error_out=False)
     services = services_pagination.items
-
     return render_template(
         'adminx/services.html',
         title='사용자 관리',
@@ -285,7 +261,6 @@ def edit_service(service_id):
 @admin_required
 def delete_service(service_id):
     service = Service.query.get_or_404(service_id)
-
     try:
         db.session.delete(service)
         db.session.commit()
@@ -293,7 +268,6 @@ def delete_service(service_id):
     except Exception as e:
         db.session.rollback()
         flash(f'사용자 삭제 중 오류가 발생했습니다: {e}', 'danger')
-
     return redirect(url_for('adminx.services', **request.args)) # Pass current search args
 @adminx.route('/services/create', methods=['GET', 'POST'])
 @admin_required
@@ -305,12 +279,10 @@ def create_service():
         description = request.form.get('description')
         keywords = request.form.get('keywords')
         service_endpoint = request.form.get('service_endpoint')
-
         # 필수 필드 유효성 검사
         if not servicename or not price or not description or not keywords or not service_endpoint:
             flash('서비스 이름, 단가, 설명, 키워드, 서비스 엔드포인트는 필수 입력 사항입니다.', 'danger')
             return render_template('adminx/create_service.html', title='서비스 생성')
-
         # 서비스 이름 또는 설명 중복 확인
         if Service.query.filter_by(servicename=servicename).first():
             flash('이미 존재하는 서비스 이름입니다.', 'danger')
@@ -334,5 +306,4 @@ def create_service():
         except Exception as e:
             db.session.rollback()
             flash(f'사용자 생성 중 오류가 발생했습니다: {e}', 'danger')
-
     return render_template('adminx/create_service.html', title='서비스 생성')

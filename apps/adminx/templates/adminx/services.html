@@ -47,9 +47,9 @@
                 <th scope="col">설명</th>
                 <th scope="col">키워드</th>
                 <th scope="col">엔드포인트</th>
-                <th scope="col">상태</th>
+                <th scope="col">활성 상태</th>
                 <th scope="col">등록일</th>
-                <th scope="col">활성</th>
+                <th scope="col">활성화</th>
                 <th scope="col">수정</th>
                 <th scope="col">삭제</th>
             </tr>
@@ -138,13 +138,11 @@
     등록된 서비스가 없습니다.
 </div>
 {% endif %}
-
 <style>
 /* 모바일 (기본값) */
 .user-create-btn {
     width: 100%; /* 모바일에서 전체 폭 */
 }
-
 /* Medium (md) 이상 화면 (768px 이상) */
 @media (min-width: 768px) {
     .user-create-btn {
@@ -153,3 +151,4 @@
 }
 </style>
 {% endblock %}
+
