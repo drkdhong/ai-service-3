@@ -1,0 +1,62 @@
+{# apps/mypagex/templates/mypagex/subscriptions.html #}
+{% set title = "내 구독 현황" %}
+{% extends "base.html" %}{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1 class="mb-4">내 AI 서비스 구독 현황</h1>
+{% if subscriptions %}
+<div class="table-responsive">
+    <table class="table table-hover table-striped">
+        <thead class="table-primary">
+            <tr>
+                <th scope="col">서비스 이름</th>
+                <th scope="col">서비스 활성화 여부</th> {# <-- 새로 추가된 컬럼 #}
+                <th scope="col">신청일</th>
+                <th scope="col">상태</th>
+                <th scope="col">승인일</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sub in subscriptions %}
+            <tr>
+                <td>
+                    {% if sub.service.is_active %}
+                        <a href="{{ url_for('main.service_detail', service_id=sub.service.id) }}">{{ sub.service.servicename }}</a>
+                    {% else %}
+                        {{ sub.service.servicename }}
+                    {% endif %}
+                </td>
+                <td> {# <-- 서비스 활성화 여부 표시 #}
+                    {% if sub.service.is_active %}
+                        <span class="badge bg-success">활성</span>
+                    {% else %}
+                        <span class="badge bg-secondary">비활성</span>
+                    {% endif %}
+                </td>
+                <td>{{ sub.request_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                    {% if sub.status == 'approved' %}
+                        <span class="badge bg-success">승인됨</span>
+                    {% elif sub.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">대기 중</span>
+                    {% elif sub.status == 'rejected' %}
+                        <span class="badge bg-danger">거부됨</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if sub.approval_date %}
+                        {{ sub.approval_date.strftime('%Y-%m-%d %H:%M') }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">
+    아직 구독한 AI 서비스가 없습니다. <a href="{{ url_for('main.services') }}">서비스를 찾아보세요!</a>
+</div>
+{% endif %}
+{% endblock %}
