@@ -76,7 +76,7 @@ class Service(db.Model):
     price = db.Column(db.Integer, default=0, nullable=False)  # 서비스 단가
     description = db.Column(db.Text, nullable=False)
     keywords = db.Column(db.String(200), nullable=False)
-    service_endpoint = db.Column(db.String(255), nullable=True)  # 서비스 엔드포인트 함수
+    service_endpoint = db.Column(db.String(255), nullable=True)  # 서비스 엔드포인트 함수, 일단 True
     created_at=db.Column(db.DateTime, default= datetime.now)
     updated_at=db.Column(db.DateTime, default= datetime.now, onupdate=datetime.now)
 
@@ -92,15 +92,12 @@ class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     # aiservice.id -> services.id로 변경
-    ai_service_id = db.Column(db.Integer, db.ForeignKey('services.id'), nullable=False) 
+    service_id = db.Column(db.Integer, db.ForeignKey('services.id'), nullable=False) 
     status = db.Column(db.String(20), default='pending', nullable=False) # pending, approved, rejected
     request_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
     approval_date = db.Column(db.DateTime, nullable=True)
 
-    # service_id -> ai_service_id로 변경
-    __table_args__ = (db.UniqueConstraint('user_id', 'ai_service_id', name='_user_service_uc'),)
+    __table_args__ = (db.UniqueConstraint('user_id', 'service_id', name='_user_service_uc'),)
 
     def __repr__(self) -> str:
-        # service_id -> ai_service_id로 변경
-        return f"<Subscription(user_id={self.user_id}, ai_service_id={self.ai_service_id}, status='{self.status}')>"
-
+        return f"<Subscription(user_id={self.user_id}, service_id={self.service_id}, status='{self.status}')>"

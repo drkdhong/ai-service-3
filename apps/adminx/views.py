@@ -1,5 +1,5 @@
 # apps/adminx/views.py
-import datetime
+from datetime import datetime
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from sqlalchemy import func, or_
