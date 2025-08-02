@@ -1,12 +1,44 @@
-<!-- apps/main/templates/main/predict_loan.html -->
 {% extends "base.html" %}
-{% block title %}대출 분류 서비스{% endblock %}
-
+{% block title %}붓꽃(IRIS) 분류하기{% endblock %}
 {% block content %}
-    <div class="p-5 mb-1 bg-light rounded-3">
-        <div class="container-fluid py-5">
-            <h3 class="display-6 fw-bold">대출 분류 서비스에 오신 것을 환영합니다!</h3>
-            <p class="col-md-8 fs-4">기계 학습 기반 대출 분류 서비스를 경험하고, 금융 분야의 전문가가 되어 보세요.</p>
+    <h1 class="mb-4">붓꽃(IRIS) 분류 서비스 사용</h1>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">붓꽃 특징 입력</h5>
+        </div>
+        <div class="card-body">
+            <p class="card-text">
+                이 페이지에서는 붓꽃의 네 가지 특징(세팔 길이, 세팔 너비, 페탈 길이, 페탈 너비)을 입력하여
+                어떤 종류의 붓꽃(Setosa, Versicolor, Virginica)인지 예측해볼 수 있습니다.
+                이 기능은 'IRIS Classification' 서비스에 대한 <strong class="text-success">승인된 구독</strong>이 있어야 사용 가능합니다.
+            </p>
+            {# <form method="POST" action="{{ url_for('user.predict_iris') }}"> #}
+            <form method="POST" action="#">
+                {# {{ csrf_token() }} #}
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="sepal_length" class="form-label">세팔 길이 (cm)</label>
+                        <input type="number" step="0.1" class="form-control" id="sepal_length" name="sepal_length" required value="5.1">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="sepal_width" class="form-label">세팔 너비 (cm)</label>
+                        <input type="number" step="0.1" class="form-control" id="sepal_width" name="sepal_width" required value="3.5">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="petal_length" class="form-label">페탈 길이 (cm)</label>
+                        <input type="number" step="0.1" class="form-control" id="petal_length" name="petal_length" required value="1.4">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="petal_width" class="form-label">페탈 너비 (cm)</label>
+                        <input type="number" step="0.1" class="form-control" id="petal_width" name="petal_width" required value="0.2">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">IRIS 분류하기</button>
+            </form>
         </div>
     </div>
+
+    <small class="text-muted d-block text-center mt-3">
+        <a href="{{ url_for('main.services') }}" role="button">서비스로 돌아가기</a>
+    </small>
 {% endblock %}
