@@ -1,0 +1,58 @@
+{# apps/main/templates/main/services.html #}
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1 class="mb-4">AI 서비스 목록</h1>
+<div class="row mb-4">
+    <div class="col-md-8 offset-md-2">
+        <form method="GET" action="{{ url_for('main.services') }}" class="input-group">
+            <input type="search" class="form-control" placeholder="서비스 이름, 설명, 키워드로 검색..." aria-label="Search" name="query" value="{{ query }}">
+            <button class="btn btn-outline-primary" type="submit">검색</button>
+        </form>
+    </div>
+</div>
+{% if services %}
+<div class="row">
+    {% for service in services %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ service.name }}
+                    {% if service.is_auto %}
+                        <span class="badge bg-success">자동승인</span>
+                    {% else %}
+                        <span class="badge bg-secondary">수동승인</span>
+                    {% endif %}
+                </h5>
+                <p class="card-text">{{ service.description | truncate(150) }}</p>
+                <p class="card-text"><small class="text-muted">키워드: {{ service.keywords }}</small></p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('main.service_detail', service_id=service.id) }}" class="btn btn-info btn-sm">자세히 보기</a>
+                    {% if current_user.is_authenticated %}
+                        {% set status = user_subscriptions.get(service.id) %}
+                        {% if status == 'approved' %}
+                            <span class="badge bg-success">구독 중</span>
+                        {% elif status == 'pending' %}
+                            <span class="badge bg-warning text-dark">승인 대기 중</span>
+                        {% elif status == 'rejected' %}
+                            <span class="badge bg-danger">거부됨</span>
+                        {% else %}
+                            <a href="{{ url_for('main.service_detail', service_id=service.id) }}" class="btn btn-success btn-sm">구독 신청</a>   {# main.service_detail은 POST로 신청해야만 구독 신청됨 <구독가능>으로 대치..#}
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('auth.login', next=url_for('main.service_detail', service_id=service.id)) }}" class="btn btn-secondary btn-sm">로그인 후 구독</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">
+    {{ "검색 결과가 없습니다." if query else "아직 등록된 AI 서비스가 없습니다." }}
+</div>
+{% endif %}
+{% endblock %}
+
+

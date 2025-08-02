@@ -1,0 +1,59 @@
+{# apps/main/templates/main/service_detail.html #}
+{% extends "base.html" %}{% block title %}{{ service.name }}{% endblock %}{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white"><h1 class="card-title mb-0">{{ service.name }}</h1>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ service.description }}
+                    {% if service.is_auto %}
+                        <span class="badge bg-success">자동승인</span>
+                    {% else %}
+                        <span class="badge bg-secondary">수동승인</span>
+                    {% endif %}
+                </p><hr>
+                <p class="card-text"><strong>키워드:</strong> <span class="badge bg-secondary">{{ service.keywords }}</span></p>
+                <h5 class="mt-4">구독 상태</h5>
+                <div class="alert {% if subscription_status == 'approved' %}alert-success{% elif subscription_status == 'pending' %}alert-warning{% elif subscription_status == 'rejected' %}alert-danger{% else %}alert-info{% endif %}">
+                    {% if subscription_status == 'approved' %}
+                        이 서비스를 구독 중입니다. 지금 바로 API를 사용해보세요!
+                    {% elif subscription_status == 'pending' %}
+                        구독 승인 대기 중입니다. 관리자의 승인을 기다려주세요.
+                    {% elif subscription_status == 'rejected' %}
+                        구독 요청이 거부되었습니다.
+                    {% else %}
+                        이 서비스를 구독하지 않고 있습니다.
+                    {% endif %}
+                </div>
+                <div class="mt-4">
+                    {% if current_user.is_authenticated %}
+                        {% if subscription_status == 'approved' %}
+                            {# <a href="{{ url_for('mypagex.api_keys') }}" class="btn btn-primary me-2">내 API 키관리</a> #}
+                            {# service_endpoint 값이 있으면 활성화하고 링크 연결#}
+                            {% if service_endpoint %}
+                                <a href="{{ service_endpoint }}" class="btn btn-info me-2">서비스 사용</a>
+                            {% else %}
+                                <button type="button" class="btn btn-info" disabled>서비스 사용 (API/웹 UI)</button>
+                            {% endif %}
+                        {% elif subscription_status == 'pending' %}
+                            <button type="button" class="btn btn-warning" disabled>승인 대기 중</button>
+                        {% elif subscription_status == 'rejected' %}
+                            <p class="text-danger">구독이 거부되었습니다. 관리자에게 문의하세요.</p>
+                        {% else %}
+                            <form method="POST" action="{{ url_for('main.service_detail', service_id=service.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-success">이 서비스 구독 신청</button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('auth.login', next=url_for('main.service_detail', service_id=service.id)) }}" class="btn btn-secondary">로그인 후 구독 신청</a>
+                    {% endif %}</div>
+                <div class="mt-4">
+                    <a href="{{ url_for('main.services') }}" class="btn btn-outline-secondary">목록으로 돌아가기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
