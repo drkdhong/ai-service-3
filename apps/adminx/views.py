@@ -14,7 +14,7 @@ def dashboard():
     total_users = User.query.count()
     total_services = Service.query.count()  # Service.query.filter_by(is_active=True).count()
     active_services = Service.query.filter_by(is_active=True).count()
-    pending_subscriptions = 4 # Subscription.query.filter_by(status='pending').count()
+    pending_subscriptions = Subscription.query.filter_by(status='pending').count()
     # 최근 7일간 서비스 사용량 (로그인 제외)
     #seven_days_ago = datetime.now() - datetime.timedelta(days=7)
     recent_service_usage = 0
@@ -327,3 +327,34 @@ def create_service():
             db.session.rollback()
             flash(f'사용자 생성 중 오류가 발생했습니다: {e}', 'danger')
     return render_template('adminx/create_service.html', title='서비스 생성')
+# 구독용 추가된 내용  ## 승인 내용을 자동승인/수동승인으로 변경시 수정
+@adminx.route('/subscriptions')
+@admin_required
+def subscriptions():
+    pending_subscriptions = Subscription.query.filter_by(status='pending').order_by(Subscription.request_date.asc()).all()
+    approved_subscriptions = Subscription.query.filter_by(status='approved').order_by(Subscription.request_date.desc()).all()
+    rejected_subscriptions = Subscription.query.filter_by(status='rejected').order_by(Subscription.request_date.desc()).all()
+    
+    return render_template('adminx/subscriptions.html',
+                           title='구독 승인 관리',
+                           pending_subscriptions=pending_subscriptions,
+                           approved_subscriptions=approved_subscriptions,
+                           rejected_subscriptions=rejected_subscriptions)
+@adminx.route('/subscription/<int:sub_id>/<action>', methods=['POST'])
+@admin_required
+def manage_subscription(sub_id, action):
+    subscription = Subscription.query.get_or_404(sub_id)
+    if action == 'approve':
+        subscription.status = 'approved'
+        subscription.approval_date = datetime.now()
+        flash(f'{subscription.user.username}님의 {subscription.service.servicename} 구독이 승인되었습니다.', 'success')
+        #flash(f'{subscription.user_id}님의 {subscription.service_id} 구독이 승인되었습니다.', 'success')
+    elif action == 'reject':
+        subscription.status = 'rejected'
+        subscription.approval_date = datetime.now() # 거부 시에도 날짜 기록
+        flash(f'{subscription.user.username}님의 {subscription.service.servicename} 구독이 거부되었습니다.', 'info')
+    else:
+        flash('잘못된 요청입니다.', 'danger')
+    
+    db.session.commit()
+    return redirect(url_for('adminx.subscriptions'))
