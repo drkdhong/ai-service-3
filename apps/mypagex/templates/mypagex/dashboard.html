@@ -12,8 +12,7 @@
             <div class="card-body">
                 <h5 class="card-title">{{ total_api_keys }} 개</h5>
                 <p class="card-text">API 키를 관리하여 서비스에 접근하세요.</p>
-                <a href="#" class="btn btn-light btn-sm">관리하기</a>
-{#                <a href="{{ url_for('mypagex.api_keys') }}" class="btn btn-light btn-sm">관리하기</a>  #}
+                <a href="{{ url_for('mypagex.api_keys') }}" class="btn btn-light btn-sm">관리하기</a>  
             </div>
         </div>
     </div>
@@ -49,8 +48,7 @@
                 <h3 class="text-center display-4">{{ monthly_usage }} 회</h3>
                 <p class="text-center text-muted">총 사용 횟수는 로그인 및 서비스 사용을 포함합니다.</p>
                 <div class="d-grid">
-                    <a href="#" class="btn btn-outline-primary btn-sm">자세한 통계 보기</a>
-{#                    <a href="{{ url_for('mypagex.usage_stats') }}" class="btn btn-outline-primary btn-sm">자세한 통계 보기</a>  #}
+                    <a href="{{ url_for('mypagex.usage_history') }}" class="btn btn-outline-primary btn-sm">통계 보기</a>
                 </div>
             </div>
         </div>
